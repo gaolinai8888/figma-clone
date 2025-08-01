@@ -1,14 +1,20 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import LiveCursors from "./cursor/LiveCursors";
 import { useMyPresence, useOthers } from "@/liveblocks.config";
+import CursorChat from "./cursor/CursorChat";
+import { CursorMode } from "@/types/type";
 
 // live collaboration
 const Live = () => {
   // return a list of other users currently in the same room
   const others = useOthers();
   const [{ cursor }, updateMyPresence] = useMyPresence() as any;
+
+  const [cursorState, setCursorState] = useState({
+    mode: CursorMode.Hidden,
+  });
 
   const handlePointerMove = useCallback((event: React.PointerEvent) => {
     event.preventDefault();
@@ -20,7 +26,7 @@ const Live = () => {
   }, []);
 
   const handlePointerLeave = useCallback((event: React.PointerEvent) => {
-    event.preventDefault();
+    setCursorState({ mode: CursorMode.Hidden });
 
     updateMyPresence({ cursor: null, message: null });
   }, []);
@@ -32,6 +38,35 @@ const Live = () => {
     updateMyPresence({ cursor: { x, y } });
   }, []);
 
+  useEffect(() => {
+    const onKeyUp = (e: KeyboardEvent) => {
+      if (e.key === "/") {
+        setCursorState({
+          mode: CursorMode.Chat,
+          previousMessage: null,
+          message: "",
+        });
+      } else if (e.key === "Escape") {
+        updateMyPresence({ message: "" });
+        setCursorState({ mode: CursorMode.Hidden });
+      }
+    };
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "/") {
+        e.preventDefault();
+      }
+    };
+
+    window.addEventListener("keyup", onKeyUp);
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      window.removeEventListener("keyup", onKeyUp);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [updateMyPresence]);
+
   return (
     <div
       onPointerMove={handlePointerMove}
@@ -40,6 +75,16 @@ const Live = () => {
       className="border-2 border-green-500 h-[100vh] w-full flex justify-center items-center text-center"
     >
       <h1 className="text-2xl text-white">Figma Clone</h1>
+
+      {cursor && (
+        <CursorChat
+          cursor={cursor}
+          cursorState={cursorState}
+          setCursorState={setCursorState}
+          updateMyPresence={updateMyPresence}
+        />
+      )}
+
       <LiveCursors others={others} />
     </div>
   );
