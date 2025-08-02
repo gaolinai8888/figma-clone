@@ -6,10 +6,10 @@ import { memo } from "react";
 import { navElements } from "@/constants";
 import { ActiveElement, NavbarProps } from "@/types/type";
 
-// import { Button } from "./ui/button";
-// import ShapesMenu from "./ShapesMenu";
+import { Button } from "./ui/button";
+import ShapesMenu from "./ShapesMenu";
 import ActiveUsers from "./users/ActiveUsers";
-// import { NewThread } from "./comments/NewThread";
+import { NewThread } from "./comments/NewThread";
 
 const Navbar = ({
   activeElement,
@@ -43,7 +43,7 @@ const Navbar = ({
             `}
           >
             {/* If value is an array means it's a nav element with sub options i.e., dropdown */}
-            {/* {Array.isArray(item.value) ? (
+            {Array.isArray(item.value) ? (
               <ShapesMenu
                 item={item}
                 activeElement={activeElement}
@@ -72,7 +72,7 @@ const Navbar = ({
                   className={isActive(item.value) ? "invert" : ""}
                 />
               </Button>
-            )} */}
+            )}
           </li>
         ))}
       </ul>
