@@ -6,10 +6,9 @@ import {
   useBroadcastEvent,
   useEventListener,
   useMyPresence,
-  useOthers,
 } from "@/liveblocks.config";
 import CursorChat from "./cursor/CursorChat";
-import { CursorMode, CursorState, Reaction, ReactionEvent } from "@/types/type";
+import { CursorMode, CursorState, Reaction } from "@/types/type";
 import ReactionSelector from "./reaction/ReactionButton";
 import FlyingReaction from "./reaction/FlyingReaction";
 import useInterval from "@/hooks/useInterval";
@@ -30,9 +29,7 @@ type Props = {
 
 // live collaboration
 const Live = ({ canvasRef, undo, redo }: Props) => {
-  // return a list of other users currently in the same room
-  const others = useOthers();
-  const [{ cursor }, updateMyPresence] = useMyPresence() as any;
+  const [{ cursor }, updateMyPresence] = useMyPresence();
 
   const [cursorState, setCursorState] = useState<CursorState>({
     mode: CursorMode.Hidden,
@@ -74,7 +71,7 @@ const Live = ({ canvasRef, undo, redo }: Props) => {
   }, 100);
 
   useEventListener((eventData) => {
-    const event = eventData.event as ReactionEvent;
+    const event = eventData.event;
 
     setReactions((reactions) =>
       reactions.concat([
@@ -231,7 +228,7 @@ const Live = ({ canvasRef, undo, redo }: Props) => {
           <ReactionSelector setReaction={setReaction} />
         )}
 
-        <LiveCursors others={others} />
+        <LiveCursors />
 
         <Comments />
       </ContextMenuTrigger>
